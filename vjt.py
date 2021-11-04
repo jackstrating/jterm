@@ -1,308 +1,250 @@
 
-"""CREDIT JACK STRATING IF YOU ARE USING THIS IN COMMERCIAL PRODUCTS."""
-"""ALL RIGHTS RESERVED, JACK STRATING, 2021"""
-
-
-import os
-import platform
-import sys
-import socket
-from colorama import*
+import os, socket, platform, asyncio, shlex
 from requests import get
-import base64
-from tkinter import*
-import ctypes
+from colorama import *
 
-
+os.system('cls')
+os.system('title JTERM@'+platform.node())
 init(convert=True)
-os.system('cls' or 'clear')
-
-print(f"""
-{Style.DIM}JTERM v.1.1.1
-by Jack Strating, all rights reserved.
-https://www.github.com/jackstrating/jterm
-""")
 
 
-RUN = True
-ROOT = False
+""" ERROR CLASSES (IGNORE) """
 
 
-
-def out(r, t) -> str:
-    print(f'{Fore.LIGHTGREEN_EX}stdout {Fore.LIGHTMAGENTA_EX}<< {Fore.WHITE}{t}\n') 
-
-class settings:
-
-    def __init__(self):
-        pass
-
-
-class argvar(settings):
-
-    def argvar() -> list:
-        try:
-            out(0, sys.argv)
-        except Exception as e:
-            out(1, e)
-
-
-class puts(settings):
-
-    def puts(t) -> str:
-        try:
-            out(0, t)
-        except Exception as e:
-            out(1, e)
-
-
-class rf(settings):
-
-    def rf(f) -> str:
-        try:
-            with open(f, 'r', encoding='utf-8') as a:
-                out(0, a.read())
-        except Exception as e:
-            out(1, e)
-
-
-class ld(settings):
-
-    def ld() -> str:
-        try:
-            total = 0
-            for f in os.listdir():
-                total += 1
-                print(f'{Fore.LIGHTBLUE_EX}> {f}')
-            out(0, f'counted {Fore.CYAN}{total}{Fore.RESET} files.')
-        except Exception as e:
-            out(1, e)
-
-
-class kill(settings):
-
-    def kill(t) -> str:
-        try:
-            out(0, os.system(f'taskkill /F /IM {t}'))
-        except Exception as e:
-            out(1, e)
-
-
-class uname(settings):
-
-    def uname() -> str:
-        try:
-            out(0, platform.node())
-        except Exception as e:
-            out(1, e)
-
-
-class node(settings):
-
-    def node() -> str:
-        try:
-            out(0, platform.node())
-        except Exception as e:
-            out(1, e)
-
-
-class getmac(settings):
-
-    def getmac():
-        try:
-            os.system('getmac')
-        except Exception as e:
-            out(1, e)
-
-
-class cl(settings):
-
-    def cl() -> 0:
-        try:
-            out(0, os.system('cls'))
-        except Exception as e:
-            out(1, e)
-
-
-class cwd(settings):
-
-    def cwd() -> str:
-        try:
-            out(0, os.getcwd())
-        except Exception as e:
-            out(1, e)
-
-
-class py(settings):
-
-    def py(t) -> str:
-        try:
-            out(0, exec(t))
-        except Exception as e:
-            out(1, e)
-
-
-class ipinternal(settings):
-
-    def ipinternal() -> str:
-        try:
-            out(0, get('https://api.ipify.org').text)
-        except Exception as e:
-            out(1, e)
-
-
-class cd(settings):
-
-    def cd(direc) -> 0:
-        try:
-            out(0, os.chdir(direc))
-        except Exception as e:
-            out(0, e)
+class Err:
+    def __init__(self, error_name, details):
+            self.error_name = error_name
+            self.details = details
         
+    def __repr__(self):
+        result  = f'{self.error_name}: \'{self.details}\'\n'
+        return result
 
-class db64f(settings):
+class InvalidSyntax(Err):
+    def __init__(self, details):
+        super().__init__('InvalidSyntaxErr', details)
 
-    def db64(f) -> str:
+class FileNotFound(Err):
+    def __init__(self, details):
+        super().__init__('FileNotFoundErr', details)
+
+class RequiredParam(Err):
+    def __init__(self, details):
+        super().__init__('RequiredParamErr', details)
+
+class ConnectionDenied(Err):
+    def __init__(self, details):
+        super().__init__('ConnectionDeniedErr', details)
+
+class AccessDenied(Err):
+    def __init__(self, details):
+        super().__init__('AccessDeniedErr', details)
+
+
+class JTERM:
+
+    def __init__(self):  
+
+        self.main_input = input(rf'({os.getcwd()}){Fore.LIGHTGREEN_EX} {platform.node()}{Fore.YELLOW} @ {platform.platform()}' + '\n' + fr'{Fore.RESET} @ ')
+        self.shlex_split = shlex.split(self.main_input)
+        self.INFO = {
+
+        
+            'platform': platform.system(),
+            'platform-version': platform.version(),
+            'hostname': socket.gethostname(), 
+            'ip-address': socket.gethostbyname(socket.gethostname()),
+            'public-ip': self.public_ipv4(),
+            'processor': platform.processor(),
+            'release': platform.release(),
+            'cwd': os.getcwd(),
+            
+
+        }
+        
+        
         try:
-            decoded = open(f,'r')
-            out(0, base64.b64decode(str(decoded.read())))
-        except Exception as e:
-            out(1, e)
+            if 'cd' in self.shlex_split[0]:
+                try:
+                    os.chdir(self.main_input[3:])
+                except Exception:
+                    print(FileNotFound(f'{self.main_input[3:]}'))
 
 
-class eb64f(settings):
+            elif 'ld' in self.shlex_split[0]:
+                self.ld()
 
-    def eb64(f) -> str:
-        try:
-            encoded = open(f,'r')
-            out(0, base64.b64encode(str(encoded.read())))
-        except Exception as e:
-            out(1, e)
+            elif 'wf' in self.shlex_split[0]:
+                self.wf()
 
-class eb64(settings):
-    def eb64(t) -> str:
-        try:
-            t.encode('ascii')
-            encoded = base64.b64encode(bytes(t, encoding='utf-8'))
-            out(0, encoded)
-        except Exception as e:
-            out(1, e)
+            elif 'puts' in self.shlex_split[0]:
+                self.puts()
 
-
-class db64(settings):
-    def db64(t) -> str:
-        try:
-            decoded = base64.b64decode(t)
-            out(0, decoded)
-        except Exception as e:
-            out(1, e)
+            elif 'rl' in self.shlex_split[0]:
+                self.rl()
+            
+            elif 'mdir' in self.shlex_split[0]:
+                self.mdir()
+            
+            elif 'rf' in self.shlex_split[0]:
+                asyncio.run(self.rf())
 
 
-class run:
-
-    def run(f) -> 0:
-        try:
-            os.system(f'start {f}')
-        except Exception as e:
-            out(1, e) 
-
-
-class backg:
-
-    def backg(f) -> 0:
-        try:
-            if out(0, ctypes.windll.user32.SystemParametersInfoW(20, 0, f'{f}' , 0)) == False:
-                pass
+            elif self.shlex_split[0] in self.INFO:
+                print(self.INFO[self.shlex_split[0]])
+            
             else:
-                out(0, ctypes.windll.user32.SystemParametersInfoW(20, 0, f'{f}' , 0))
-        except Exception as e:
-            out(1, e)
+                print(InvalidSyntax(str(self.main_input)))
 
-
-def main():
-
-    mi = input('(' + str(os.getcwd()) + ') ' + Fore.LIGHTGREEN_EX + 
-    str(os.getlogin()) + "@" + str(platform.node()) + 
-    Fore.LIGHTMAGENTA_EX + " " + str(platform.system()) + 
-    Fore.YELLOW + " ~" + "\n" +
-    Fore.WHITE + '& ')
-
-    if 'puts' in mi[0:4]:     
-        out(0, str(mi[4:]))
-
-    elif 'rf' in mi[0:2]:
-        rf.rf(mi[3:])
-
-    elif 'ld' in mi[0:2]:
-        ld.ld()
-
-    elif 'kill' in mi[0:4]:
-        kill.kill(mi[5:])
-
-    elif 'uname' in mi[0:5]:
-        uname.uname()
-
-    elif 'getmacaddr' in mi[0:10]:
-        getmac.getmac()
-
-    elif 'cl' in mi:
-        cl.cl()
-
-    elif 'node' in mi[0:4]:
-        node.node()
-
-    elif 'cwd' in mi[0:3]:
-        cwd.cwd()
+        except Exception:
+            pass
         
-    elif 'py' in mi[0:2]:
-        if '--s' or '-s' in mi:
-            while True:
-                loop = py.py(input(f'{Fore.LIGHTGREEN_EX}py {Fore.LIGHTMAGENTA_EX}>>> {Fore.RESET}'))
-                return loop
-
-        else:
-            py.py(mi[4:])
     
-    elif 'db64f' in mi[0:5]:
-            db64f.db64(mi[6:])
+
+    def rf(self):
+
+        try:
+            with open(self.shlex_split[1], 'r') as w:
+                print(f'{Fore.LIGHTBLUE_EX}{w.read()}{Fore.RESET}')
+
+                if 'w|o' in self.shlex_split[2]:
+                    with open(self.shlex_split[3], 'w') as x:
+                        r = w.read()
+                        x.write(r)
+                return w
+
+        except FileNotFoundError or FileExistsError:
+            print(FileNotFound(f'{self.shlex_split[1]}'))
+
+
+    def wf(self):
+
+        """
+        THE FUNCTION OF WF IS TO CREATE A FILE.
+        e.g.
+        >> wf foo/bar/hello_world.txt
+        << File created: 'hello_world.txt'
+            """
+
+        try:
+            with open(self.shlex_split[1], 'w', encoding='utf-8') as w:
+                w.write(self.shlex_split[2:])
+                w.close()
+
+        except Exception:
+            AccessDenied(f'{self.shlex_split[1]} cannot be created.')
     
-    elif 'eb6f' in mi[0:5]:
-        eb64f.eb64(mi[6:])
+    def rl(self):
+        try:
 
-    elif 'eb64' in mi[0:4]:
-        eb64.eb64(mi[0:5])
+            total_lines = 0
+            total_char = 0
+
+            with open(self.main_input[3:], 'r', encoding='utf-8') as f:
+                
+
+                for line in f.readlines():
+                    total_lines += 1
+
+                f.read()
+                return f.read(), print(f'{Fore.LIGHTBLUE_EX} counted a total of {total_lines} lines. {Fore.RESET}')
+
+        except Exception:
+            FileNotFound(self.main_input[3:])
     
-    elif 'db64' in mi[0:4]:
-        db64.db64(mi[0:5])
+    def puts(self):
 
-    elif 'ip' in mi[0:2]:
-        ipinternal.ipinternal()
+        """
+        PUTS IS USED FOR PRINTING STRING TO THE CONSOLE.
+        THIS COMMAND CLOSELY RESEMBLES 'echo' FROM THE WINDOWS SHELL (WITHOUT % FUNCTION).
+        e.g. 
+        >> puts hello world!
+        << hello world!
+        """
+        
+        try:
+            if 'w|o' in self.shlex_split:
+                index = self.shlex_split.index('w|o') + 1
+                with open(self.shlex_split[3], 'w') as x:
+                    x.write(self.main_input[5:].split(index[-1]))
+            else:
+                print(self.main_input[5:])
+
+        except Exception:
+            InvalidSyntax(self.main_input[5:])
+        
+        return
+
+
+    def ld(self):
+
+        """
+        LD IS USED FOR LISTING A SPECIFIED/CURRENT DIRECTORY.
+        LD ALSO RETURNS THE AMOUNT OF CHARACTERS SPECIFIED IN THE FILE AND THE AMOUNT OF LINES COUNTED IN THE FILE.
+        e.g.
+        >> ld root/foo/bar/
+        << main.py \n helloworld.txt \n password_secret.txt \n etc.etc
+        """
+
+        try:
+
+            total_files = 0
+
+            for f in os.listdir(os.getcwd()):
+                total_files += 1
+                print(f'{Fore.LIGHTBLUE_EX}> {f} {Fore.RESET}')
+
+            print(f'{Fore.LIGHTBLUE_EX} counted a total of {total_files} file(s). {Fore.RESET}')
+
+            return f
+
+        except Exception: 
+            return FileNotFound(self.main_input[3:])
     
-    elif 'argvar' in mi[0:6]:
-        argvar.argvar()
+    def public_ipv4(self):
 
-    elif 'cd' in mi[0:2]:
-        cd.cd(mi[3:])
+        """
+        PUBLIC-IPV4 IS USED FOR RETURNING THE SPECIFIED COMPUTERS PUBLIC IPV4 ADDRESS VIA 'https://api.ipify.org'
+        e.g.
+        >> 'public-ip'
+        << 12.34.5678
+        """
+        try:
 
-    elif 'exit' in mi[0:4]:
-        sys.exit()
+            ip = get('https://api.ipify.org/').text
+            return ip
 
-    elif 'run' in mi[0:3]:
-        if '.py' in mi:
-            os.system(f'python {mi[4:]}')
-        run.run(mi[4:])
-    
-    elif 'backg' in mi[0:5]:
-        backg.backg(mi[5:])
-
+        except Exception:
+            ConnectionDenied('Connection unable to be preformed.')
 
 
-    else:
-        out(1, f'"{mi}" is not a recognized command. type "help" for more information.')
+    def getscrape(self):
+        try:
+            result = get(self.shlex_split[1]).text
+            with open(rf'{self.shlex_split[2]}', 'w') as f:
+                f.write(result)
+                print(f'Saved to {self.shlex_split[2]}')
+                f.close()
+            return result
 
+        except Exception:
+            pass
+
+    def mdir(self):
+
+        """
+        MDIR HAS THE SAME FUNCTION AS 'os.mkdir()'
+        e.g.
+        >> mdir foo/bar/buzz.txt
+        << Directory created: 'buzz.txt'
+        """
+
+        try:
+            os.mkdir(self.shlex_split[1:])
+            print(rf'Directory created @ \'{self.shlex_split[2:]}\'')
+        except Exception:
+            AccessDenied(f'File {self.shlex_split[2:]} is not permitted to be overwritten/created in this specific directory.')
 
 if __name__ == '__main__':
     while True:
-        if RUN == True:
-            main()
-
+        JTERM()
